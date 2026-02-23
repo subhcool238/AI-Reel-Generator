@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Long-to-Short Reel Generator</title>
+    <meta name="description"
+        content="Convert your long 16:9 videos into engaging 9:16 reels with AI multi-lingual translation and subtitles.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Load Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="container">
+        <header>
+            <h1><i class="fa-solid fa-wand-magic-sparkles"></i> AI Reel Generator</h1>
+            <p class="subtitle">Transform long-form content into viral semantic reels</p>
+        </header>
+
+        <main class="glass-panel">
+            <!-- Step 1: Source -->
+            <section class="step-section" id="step-source">
+                <div class="step-header">
+                    <span class="step-number">1</span>
+                    <h2>Media Source</h2>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" data-target="upload-tab"><i class="fa-solid fa-upload"></i> Upload
+                        Video</button>
+                    <button class="tab-btn" data-target="youtube-tab"><i class="fa-brands fa-youtube"></i> YouTube
+                        URL</button>
+                </div>
+
+                <div class="tab-content active" id="upload-tab">
+                    <div class="drop-zone" id="drop-zone">
+                        <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+                        <p class="drop-text">Drag & Drop your video here</p>
+                        <p class="drop-subtext">or click to browse files (MP4, MOV)</p>
+                        <input type="file" id="file-input" accept="video/mp4,video/quicktime" hidden>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="youtube-tab">
+                    <div class="url-input-container">
+                        <i class="fa-brands fa-youtube url-icon"></i>
+                        <input type="url" id="youtube-url" placeholder="https://www.youtube.com/watch?v=...">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: Time Ranges -->
+            <section class="step-section" id="step-timestamps">
+                <div class="step-header">
+                    <span class="step-number">2</span>
+                    <h2>Select Timestamps</h2>
+                </div>
+                <p class="section-desc">Add the start and end times (in seconds) for the highlights you want to extract.
+                </p>
+
+                <div id="timestamps-container">
+                    <div class="timestamp-row">
+                        <div class="input-group">
+                            <label>Start</label>
+                            <input type="text" class="time-start" placeholder="e.g. 1:20 or 80" required>
+                        </div>
+                        <div class="input-group">
+                            <label>End</label>
+                            <input type="text" class="time-end" placeholder="e.g. 1:45 or 105" required>
+                        </div>
+                        <button class="icon-btn remove-btn disabled"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+
+                <button id="add-timestamp-btn" class="secondary-btn"><i class="fa-solid fa-plus"></i> Add Another
+                    Segment</button>
+            </section>
+
+            <!-- Step 3: Settings -->
+            <section class="step-section" id="step-settings">
+                <div class="step-header">
+                    <span class="step-number">3</span>
+                    <h2>Translation & Output</h2>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="input-group">
+                        <label>Voice Language (Sarvam AI)</label>
+                        <select id="voice-lang">
+                            <option value="hi-IN">Hindi (India)</option>
+                            <option value="bn-IN">Bengali (India)</option>
+                            <option value="ta-IN">Tamil (India)</option>
+                            <option value="te-IN">Telugu (India)</option>
+                            <option value="mr-IN">Marathi (India)</option>
+                            <option value="gu-IN">Gujarati (India)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Subtitle Language</label>
+                        <select id="sub-lang">
+                            <option value="hi">Hindi</option>
+                            <option value="bn">Bengali</option>
+                            <option value="ta">Tamil</option>
+                            <option value="te">Telugu</option>
+                            <option value="mr">Marathi</option>
+                            <option value="gu">Gujarati</option>
+                            <option value="en">English (Translated)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>AI Voice Gender</label>
+                        <select id="gender">
+                            <option value="male">Male (Hitesh)</option>
+                            <option value="female">Female (Manisha)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Submit Action -->
+            <div class="action-section">
+                <button id="generate-btn" class="primary-btn">
+                    <span class="btn-text">Generate AI Reel</span>
+                    <i class="fa-solid fa-wand-magic-sparkles btn-icon"></i>
+                </button>
+            </div>
+
+            <!-- Status overlay/panel -->
+            <div id="status-panel" class="hidden">
+                <div class="status-content">
+                    <div class="spinner"></div>
+                    <h3 id="status-title">Uploading...</h3>
+                    <p id="status-message">Please wait while we process the video source.</p>
+                </div>
+                <!-- Result Action -->
+                <div id="result-actions" class="hidden">
+                    <i class="fa-solid fa-circle-check success-icon"></i>
+                    <h3>Reel Generated Successfully!</h3>
+
+                    <div class="video-preview-ctn">
+                        <video id="final-video-player" controls preload="metadata">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+
+                    <a id="download-btn" href="#" class="primary-btn download-btn">
+                        <i class="fa-solid fa-download"></i> Download Master Reel
+                    </a>
+                    <button id="reset-btn" class="secondary-btn">Create Another</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+
+</html>
