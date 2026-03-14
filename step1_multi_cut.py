@@ -22,7 +22,6 @@ def multi_segment_cut(input_path, time_ranges):
             output_path, 
             codec="libx264", 
             audio_codec="aac", 
-            preset="ultrafast", 
-            threads=4
+            preset="ultrafast"
         )
         return output_path

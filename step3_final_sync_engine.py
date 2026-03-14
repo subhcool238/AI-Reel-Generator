@@ -52,7 +52,12 @@ def process_voice_and_metadata(vocal_path, voice_lang="hi-IN", sub_lang="hi", ge
                 "translated_text": s_text 
             })
             os.remove(p)
+        else:
+            print(f"❌ Sarvam API Error on chunk {i}: {res.status_code} - {res.text}")
+        
+        import time
+        time.sleep(1.5) # Avoid strict rate limits on the API
 
-    final_vocal.export(f"regional_outputs/voice_sync.mp3", format="mp3")
+    final_vocal.export(f"regional_outputs/voice_sync.wav", format="wav")
     with open("regional_outputs/metadata.json", "w", encoding="utf-8") as f:
         json.dump({"segments": segments_data}, f, indent=4)

@@ -43,7 +43,7 @@ def process_pipeline(task_id, raw_video, time_ranges, voice_lang, sub_lang, gend
         TASKS[task_id]['message'] = 'Assembling Final Vertical Reel...'
         assemble_perfect_sync_reel(
             video_path=m_path,
-            voice_path="regional_outputs/voice_sync.mp3",
+            voice_path="regional_outputs/voice_sync.wav",
             music_path="stems/only_music.wav",
             json_path="regional_outputs/metadata.json",
             sub_pos=250 

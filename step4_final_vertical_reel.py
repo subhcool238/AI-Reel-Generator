@@ -56,6 +56,5 @@ def assemble_perfect_sync_reel(video_path, voice_path, music_path, json_path,
             fps=24, 
             codec="libx264", 
             audio_codec="aac",
-            preset="ultrafast",
-            threads=4
+            preset="ultrafast"
         )
