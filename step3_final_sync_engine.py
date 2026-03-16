@@ -13,7 +13,8 @@ def process_voice_and_metadata(vocal_path, voice_lang="hi-IN", sub_lang="hi", ge
     if not os.path.exists('regional_outputs'): os.makedirs('regional_outputs')
     
     video_dur = int(librosa.get_duration(path=vocal_path) * 1000)
-    final_vocal = AudioSegment.silent(duration=video_dur)
+    final_vocal = AudioSegment.silent(duration=0)
+    current_time = 0.0
     
     print("🚀 Transcribing with local MLX-Whisper...")
     result = mlx_whisper.transcribe(vocal_path, path_or_hf_repo="mlx-community/whisper-medium-mlx")
@@ -40,17 +41,23 @@ def process_voice_and_metadata(vocal_path, voice_lang="hi-IN", sub_lang="hi", ge
             with open(p, "wb") as f: f.write(base64.b64decode(res.json()["audios"][0]))
             
             chunk = AudioSegment.from_file(p)
-            final_vocal = final_vocal.overlay(chunk, position=int(seg['start'] * 1000))
-            
-            # Prevent overlaps: if next chunk's start is too close, trim the end
-            # Using actual duration of the generated speech block instead of arbitrarily extending
             chunk_dur_sec = len(chunk) / 1000.0
             
+            target_start = max(0.0, seg['start'])
+            if target_start > current_time:
+                final_vocal += AudioSegment.silent(duration=int((target_start - current_time) * 1000))
+                actual_start = target_start
+            else:
+                actual_start = current_time
+                
+            final_vocal += chunk
+            
             segments_data.append({
-                "start": max(0, seg['start']), 
-                "end": seg['start'] + chunk_dur_sec,
+                "start": actual_start, 
+                "end": actual_start + chunk_dur_sec,
                 "translated_text": s_text 
             })
+            current_time = actual_start + chunk_dur_sec
             os.remove(p)
         else:
             print(f"❌ Sarvam API Error on chunk {i}: {res.status_code} - {res.text}")
