@@ -29,8 +29,9 @@ def process_voice_and_metadata(vocal_path, voice_lang="hi-IN", sub_lang="hi", ge
         txt = seg['text'].strip()
         if not txt: continue
         
-        v_text = v_translator.translate(txt)
-        s_text = s_translator.translate(txt)
+        v_target = voice_lang.split('-')[0]
+        v_text = txt if v_target == 'en' else v_translator.translate(txt)
+        s_text = txt if sub_lang == 'en' else s_translator.translate(txt)
         
         payload = {"text": v_text, "target_language_code": voice_lang, "speaker": speaker, "model": "bulbul:v2"}
         headers = {"api-subscription-key": SARVAM_API_KEY, "Content-Type": "application/json"}
